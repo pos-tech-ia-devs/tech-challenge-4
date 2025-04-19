@@ -4,6 +4,7 @@ import mediapipe as mp
 import os
 import numpy as np
 from tqdm import tqdm
+from datetime import datetime
 
 def detect_pose_action(pose_landmarks):
     """
@@ -72,6 +73,30 @@ def detect_pose_action(pose_landmarks):
 
     return actions
 
+def detect_anomalous_movement(pose_landmarks, prev_pose_landmarks, threshold=0.2):
+    """
+    Detecta movimentos anômalos com base na variação dos landmarks entre frames consecutivos.
+
+    Args:
+        pose_landmarks (list): Lista de (x, y, z) dos landmarks atuais.
+        prev_pose_landmarks (list): Lista de (x, y, z) dos landmarks do frame anterior.
+        threshold (float): Limite para detectar movimentos bruscos.
+
+    Returns:
+        bool: True se o movimento for anômalo, False caso contrário.
+    """
+    if not prev_pose_landmarks or not pose_landmarks:
+        return False  # Não há dados suficientes para comparação
+
+    total_variation = 0
+    for current, previous in zip(pose_landmarks, prev_pose_landmarks):
+        variation = np.linalg.norm(np.array(current) - np.array(previous))
+        total_variation += variation
+
+    # Média da variação por landmark
+    avg_variation = total_variation / len(pose_landmarks)
+    return avg_variation > threshold
+
 def detect_emotions(video_path, output_path):
     # Capturar vídeo do arquivo especificado
     mp_pose = mp.solutions.pose
@@ -93,15 +118,20 @@ def detect_emotions(video_path, output_path):
     # Definir o codec e criar o objeto VideoWriter
     fourcc = cv2.VideoWriter_fourcc(*'mp4v')  # Codec para MP4
     out = cv2.VideoWriter(output_path, fourcc, fps, (width, height))
-
+    # Variáveis para estatísticas
+    frame_count = 0
+    anomaly_count = 0
+    emotion_counts = {}
+    action_counts = {}
+    prev_pose_landmarks = None  # Inicializar landmarks do frame anterior
     # Loop para processar cada frame do vídeo
     for _ in tqdm(range(total_frames), desc="Processando vídeo"):
-        # Ler um frame do vídeo
         ret, frame = cap.read()
-
-        # Se não conseguiu ler o frame (final do vídeo), sair do loop
         if not ret:
             break
+
+        frame_count += 1
+        anomalies_in_frame = False
 
         # Analisar o frame para detectar faces e expressões
         result = DeepFace.analyze(frame, actions=['emotion'], enforce_detection=False, align=False,detector_backend='mtcnn')
@@ -125,6 +155,8 @@ def detect_emotions(video_path, output_path):
             # Write the dominant emotion above the smaller rectangle
             text_x, text_y = new_x, new_y - 10  # Position the text slightly above the rectangle
             cv2.putText(frame, dominant_emotion, (text_x, text_y), cv2.FONT_HERSHEY_SIMPLEX, 0.9, (36, 255, 12), 2)
+            emotion_counts[dominant_emotion] = emotion_counts.get(dominant_emotion, 0) + 1
+            anomalies_in_frame = False
         
         # Escrever o frame processado no vídeo de saída
         out.write(frame)
@@ -139,7 +171,15 @@ def detect_emotions(video_path, output_path):
         if results.pose_landmarks:
             pose_landmarks = [(lm.x, lm.y, lm.z) for lm in results.pose_landmarks.landmark]
             actions = detect_pose_action(pose_landmarks)
+            for action, detected in actions.items():
+                if detected:
+                    action_counts[action] = action_counts.get(action, 0) + 1
 
+            # Detectar movimentos anômalos
+            if detect_anomalous_movement(pose_landmarks, prev_pose_landmarks):
+                anomalies_in_frame = True
+
+            prev_pose_landmarks = pose_landmarks  # Atualizar landmarks do frame anterior
             # Escrever as ações detectadas no frame
             action_text = ', '.join([action for action, detected in actions.items() if detected])
             cv2.putText(frame, action_text, (50, 50), cv2.FONT_HERSHEY_SIMPLEX, 0.9, (0, 255, 255), 2)
@@ -147,6 +187,9 @@ def detect_emotions(video_path, output_path):
             # Desenhar as anotações da pose no frame
             mp_drawing.draw_landmarks(frame, results.pose_landmarks, mp_pose.POSE_CONNECTIONS)
 
+        if anomalies_in_frame:
+            anomaly_count += 1
+            cv2.putText(frame, "Movimento Anômalo", (50, 100), cv2.FONT_HERSHEY_SIMPLEX, 0.9, (0, 0, 255), 2)
         # Escrever o frame processado no vídeo de saída
         out.write(frame)
 
@@ -154,11 +197,18 @@ def detect_emotions(video_path, output_path):
     cap.release()
     out.release()
     cv2.destroyAllWindows()
+    # Exibir estatísticas
+    print("Estatísticas do vídeo:")
+    print(f"Frames analisados: {frame_count}")
+    print(f"Anomalias detectadas: {anomaly_count}")
+    print(f"Emoções principais: {emotion_counts}")
+    print(f"Atividades principais: {action_counts}")
 
 # Caminho para o arquivo de vídeo na mesma pasta do script
 script_dir = os.path.dirname(os.path.abspath(__file__))
 input_video_path = os.path.join(script_dir, 'input_video.mp4')  # Substitua 'meu_video.mp4' pelo nome do seu vídeo
-output_video_path = os.path.join(script_dir, 'output_video4.mp4')  # Nome do vídeo de saída
+output_video_path = os.path.join(script_dir, f'output_video_{datetime.now().strftime("%Y%m%d_%H%M%S")}.mp4')  # Nome do vídeo de saída
+
 
 # Chamar a função para detectar emoções no vídeo e salvar o vídeo processado
 detect_emotions(input_video_path, output_video_path)

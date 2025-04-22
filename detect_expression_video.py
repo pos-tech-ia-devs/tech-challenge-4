@@ -133,8 +133,16 @@ def detect_emotions(video_path, output_path):
         frame_count += 1
         anomalies_in_frame = False
 
+        # Constants for DeepFace detector backends
+        DETECTOR_BACKEND_OPENCV = 'opencv'
+        DETECTOR_BACKEND_SSD = 'ssd'
+        DETECTOR_BACKEND_DLIB = 'dlib'
+        DETECTOR_BACKEND_MTCNN = 'mtcnn'
+        DETECTOR_BACKEND_RETINAFACE = 'retinaface'
+        DETECTOR_BACKEND_MEDIAPIPE = 'mediapipe'
+
         # Analisar o frame para detectar faces e expressões
-        result = DeepFace.analyze(frame, actions=['emotion'], enforce_detection=False, align=False,detector_backend='mtcnn')
+        result = DeepFace.analyze(frame, actions=['emotion'], enforce_detection=False, align=True,detector_backend=DETECTOR_BACKEND_SSD)
 
         # Iterar sobre cada face detectada
         for face in result:
@@ -198,11 +206,11 @@ def detect_emotions(video_path, output_path):
     out.release()
     cv2.destroyAllWindows()
     # Exibir estatísticas
-    print("Estatísticas do vídeo:")
-    print(f"Frames analisados: {frame_count}")
-    print(f"Anomalias detectadas: {anomaly_count}")
-    print(f"Emoções principais: {emotion_counts}")
-    print(f"Atividades principais: {action_counts}")
+    print("Video Statistics:")
+    print(f"1. **Frames Analyzed**: {frame_count}")
+    print(f"2. **Anomalies Detected**: {anomaly_count}")
+    print(f"3. **Main Emotions**: {emotion_counts}")
+    print(f"4. **Main Activities**: {action_counts}")
 
 # Caminho para o arquivo de vídeo na mesma pasta do script
 script_dir = os.path.dirname(os.path.abspath(__file__))

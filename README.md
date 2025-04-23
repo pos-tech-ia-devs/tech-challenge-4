@@ -47,9 +47,7 @@ The code will analyze and display the following statistics from the video:
 4. **Main Activities**: A summary of detected pose-related actions (e.g., arm up, squat) and their respective counts.
 
 ### Model `mtcnn` results [WIP]
-```
-DeepFace.analyze(frame, actions=['emotion'], enforce_detection=False, align=True,detector_backend=DETECTOR_BACKEND_MTCNN)
-```
+
 Video Statistics:
 1. **Frames Analyzed**:  3326
 2. **Anomalies Detected**: 142
@@ -57,9 +55,7 @@ Video Statistics:
 4. **Main Activities**: {'head_tilt_right': 2134, 'head_tilt_left': 1590, 'squat': 374, 'leg_up': 231, 'arm_up': 507, 'both_arms_up': 237, 'jump': 148}
 
 ### Model `mediapipe` results [DONE]
-```
-DeepFace.analyze(frame, actions=['emotion'], enforce_detection=False, align=True,detector_backend=DETECTOR_BACKEND_MEDIAPIPE)
-```
+
 Video Statistics:
 1. **Frames Analyzed**:  3326
 2. **Anomalies Detected**: 152
@@ -67,30 +63,20 @@ Video Statistics:
 4. **Main Activities**: {'head_tilt_right': 2151, 'head_tilt_left': 1683, 'arm_up': 580, 'leg_up': 279, 'squat': 316, 'both_arms_up': 239, 'jump': 147}
 
 ### Model `retinaface` results [CANCELLED]
-```
-DeepFace.analyze(frame, actions=['emotion'], enforce_detection=False, align=True,detector_backend=DETECTOR_BACKEND_RETINAFACE)
-```
 
 ### Model `opencv` results [WIP]
-```
-DeepFace.analyze(frame, actions=['emotion'], enforce_detection=False, align=True,detector_backend=DETECTOR_BACKEND_OPENCV)
-```
 
 ### Model `dlib` results [WIP]
-```
-DeepFace.analyze(frame, actions=['emotion'], enforce_detection=False, align=True,detector_backend=DETECTOR_BACKEND_DLIB)
-```
 
 ### Model `ssd` results [WIP]
-```
-DeepFace.analyze(frame, actions=['emotion'], enforce_detection=False, align=True,detector_backend=DETECTOR_BACKEND_SSD)
-```
+
+Estatísticas do Vídeo:
+1. **Frames Analisados**: 3326
+2. **Anomalias Detectadas**: 129
+3. **Emoções Principais**: {'neutral': 312, 'sad': 59, 'happy': 509, 'fear': 21, 'surprise': 36, 'angry': 39, 'disgust': 1}
+4. **Atividades Principais**: {'head_tilt_right': 2207, 'head_tilt_left': 1743, 'squat': 400, 'leg_up': 181, 'arm_up': 566, 'both_arms_up': 196, 'jump': 156}
 
 ### Model `mediapipe` results [WIP]
-```
-DeepFace.analyze(frame, actions=['emotion'], enforce_detection=False, align=True,detector_backend=DETECTOR_BACKEND_MEDIAPIPE)
-```
-
 
 ## Model Details for DeepFace detector backends
 

@@ -46,41 +46,22 @@ The code will analyze and display the following statistics from the video:
 3. **Main Emotions**: A summary of the detected emotions and their respective counts.
 4. **Main Activities**: A summary of detected pose-related actions (e.g., arm up, squat) and their respective counts.
 
-### Model `mtcnn` results [WIP]
-
-Video Statistics:
-1. **Frames Analyzed**:  3326
-2. **Anomalies Detected**: 142
-3. **Main Emotions**: {'neutral': 1222, 'sad': 884, 'fear': 580, 'angry': 310, 'happy': 856, 'surprise': 188}
-4. **Main Activities**: {'head_tilt_right': 2134, 'head_tilt_left': 1590, 'squat': 374, 'leg_up': 231, 'arm_up': 507, 'both_arms_up': 237, 'jump': 148}
-
-### Model `mediapipe` results [DONE]
-
-Video Statistics:
-1. **Frames Analyzed**:  3326
-2. **Anomalies Detected**: 152
-3. **Main Emotions**: {'angry': 239, 'neutral': 737, 'disgust': 6, 'fear': 584, 'sad': 859, 'surprise': 77, 'happy': 824}
-4. **Main Activities**: {'head_tilt_right': 2151, 'head_tilt_left': 1683, 'arm_up': 580, 'leg_up': 279, 'squat': 316, 'both_arms_up': 239, 'jump': 147}
-
-### Model `retinaface` results [CANCELLED]
-
-### Model `opencv` results [WIP]
-
-### Model `dlib` results [WIP]
-
-### Model `ssd` results [WIP]
+### Best model `mtcnn` results [WIP]
 
 Estatísticas do Vídeo:
 1. **Frames Analisados**: 3326
-2. **Anomalias Detectadas**: 129
-3. **Emoções Principais**: {'neutral': 312, 'sad': 59, 'happy': 509, 'fear': 21, 'surprise': 36, 'angry': 39, 'disgust': 1}
-4. **Atividades Principais**: {'head_tilt_right': 2207, 'head_tilt_left': 1743, 'squat': 400, 'leg_up': 181, 'arm_up': 566, 'both_arms_up': 196, 'jump': 156}
-
-### Model `mediapipe` results [WIP]
+2. **Anomalias Detectadas**: 144
+3. **Emoções Principais**: {'neutral': 1018, 'sad': 473, 'fear': 444, 'angry': 248, 'happy': 516, 'surprise': 183}
+4. **Atividades Principais**: {'head_tilt_right': 2278, 'head_tilt_left': 1610, 'arm_up': 624, 'both_arms_up': 240, 'squat': 468, 'leg_up': 324, 'jump': 199}
 
 ## Model Details for DeepFace detector backends
 
 In `DeepFace.analyze`, the `detector_backend` parameter specifies the face detection model to be used. The available options for `detector_backend` are:
+
+### `mtcnn`
+- **Description**: Uses Multi-Task Cascaded Convolutional Networks (MTCNN) for face detection.
+- **Performance**: Highly accurate, especially for detecting faces in challenging conditions (e.g., tilted or partially obscured faces). However, it is slower than `opencv` and `ssd`.
+- **Usage**: Ideal for applications where accuracy is critical, and performance is less of a concern.
 
 ### `opencv`
 - **Description**: Uses OpenCV's Haar Cascade Classifier for face detection.
@@ -96,11 +77,6 @@ In `DeepFace.analyze`, the `detector_backend` parameter specifies the face detec
 - **Description**: Uses Dlib's Histogram of Oriented Gradients (HOG) and Convolutional Neural Network (CNN) models for face detection.
 - **Performance**: More accurate than `opencv` and `ssd`, but slower. The CNN model in Dlib is particularly accurate for detecting faces in various orientations.
 - **Usage**: Suitable for applications requiring higher accuracy but can tolerate slower performance.
-
-### `mtcnn`
-- **Description**: Uses Multi-Task Cascaded Convolutional Networks (MTCNN) for face detection.
-- **Performance**: Highly accurate, especially for detecting faces in challenging conditions (e.g., tilted or partially obscured faces). However, it is slower than `opencv` and `ssd`.
-- **Usage**: Ideal for applications where accuracy is critical, and performance is less of a concern.
 
 ### `retinaface`
 - **Description**: Uses RetinaFace, a state-of-the-art face detection model.

@@ -1,0 +1,7 @@
+opencv-python~=4.11.0.86
+mediapipe~=0.10.21
+numpy~=1.26.4
+deepface~=0.0.93
+tqdm~=4.67.1
+tf-keras~=2.19.0
+ultralytics~=8.3.114

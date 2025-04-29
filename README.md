@@ -5,6 +5,10 @@
 
 ## How to Run
 
+```
+Be sure that the video named input_video.mp4 is on the root of the folder
+```
+
 First, you must create a virtual environment by running the following command:
 
 ```bash

@@ -145,18 +145,13 @@ def detect_emotions(video_path, output_path):
         anomalies_in_frame = False
 
         try:
-            # Analisar o frame para detectar faces e expressões
             result = DeepFace.analyze(frame, actions=['emotion'], enforce_detection=True, align=True,detector_backend=DEFAULT_DETECTOR_BACKEND)
 
-            # Iterar sobre cada face detectada
             for face in result:
-                # Obter a caixa delimitadora da face
                 x, y, w, h = face['region']['x'], face['region']['y'], face['region']['w'], face['region']['h']
 
-                # Obter a emoção dominante
                 dominant_emotion = face['dominant_emotion']
 
-                # Desenhar um retângulo ao redor da face
                 # Calculate the new dimensions for the rectangle (half the size)
                 new_w, new_h = w // 2, h // 2
                 new_x, new_y = x + w // 4, y + h // 4
@@ -172,16 +167,12 @@ def detect_emotions(video_path, output_path):
         except ValueError as e:
             pass
 
-        # Escrever o frame processado no vídeo de saída
         out.write(frame)
 
-        # Converter o frame para RGB
         rgb_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
 
-        # Processar o frame para detectar a pose
         results = pose.process(rgb_frame)
 
-        # Desenhar as anotações da pose no frame
         if results.pose_landmarks:
             pose_landmarks = [(lm.x, lm.y, lm.z) for lm in results.pose_landmarks.landmark]
             actions = detect_pose_action(pose_landmarks)
@@ -189,41 +180,33 @@ def detect_emotions(video_path, output_path):
                 if detected:
                     action_counts[action] = action_counts.get(action, 0) + 1
 
-            # Detectar movimentos anômalos
             if detect_anomalous_movement(pose_landmarks, prev_pose_landmarks):
                 anomalies_in_frame = True
 
-            prev_pose_landmarks = pose_landmarks  # Atualizar landmarks do frame anterior
-            # Escrever as ações detectadas no frame
+            prev_pose_landmarks = pose_landmarks
             action_text = ', '.join([action for action, detected in actions.items() if detected])
             cv2.putText(frame, action_text, (50, 50), cv2.FONT_HERSHEY_SIMPLEX, 0.9, (0, 255, 255), 2)
 
-            # Desenhar as anotações da pose no frame
             mp_drawing.draw_landmarks(frame, results.pose_landmarks, mp_pose.POSE_CONNECTIONS)
 
         if anomalies_in_frame:
             anomaly_count += 1
             cv2.putText(frame, "Movimento Anômalo", (50, 100), cv2.FONT_HERSHEY_SIMPLEX, 0.9, (0, 0, 255), 2)
-        # Escrever o frame processado no vídeo de saída
         out.write(frame)
 
-    # Liberar a captura de vídeo e fechar todas as janelas
     cap.release()
     out.release()
     cv2.destroyAllWindows()
 
-    # Exibir estatísticas
     print("Estatísticas do Vídeo:")
     print(f"1. **Frames Analisados**: {frame_count}")
     print(f"2. **Anomalias Detectadas**: {anomaly_count}")
     print(f"3. **Emoções Principais**: {emotion_counts}")
     print(f"4. **Atividades Principais**: {action_counts}")
 
-# Caminho para o arquivo de vídeo na mesma pasta do script
 script_dir = os.path.dirname(os.path.abspath(__file__))
-input_video_path = os.path.join(script_dir, 'input_video.mp4')  # Substitua 'meu_video.mp4' pelo nome do seu vídeo
+input_video_path = os.path.join(script_dir, 'input_video.mp4')  # Substitua 'input_video.mp4' pelo nome do seu vídeo
 output_video_path = os.path.join(script_dir, f'output_video_{DEFAULT_DETECTOR_BACKEND}.mp4')  # Nome do vídeo de saída
 
 
-# Chamar a função para detectar emoções no vídeo e salvar o vídeo processado
 detect_emotions(input_video_path, output_video_path)
